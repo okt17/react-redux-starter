@@ -1,10 +1,11 @@
 var
   path = require('path'),
+  CleanWebpackPlugin = require('clean-webpack-plugin'),
   WebpackNotifierPlugin = require('webpack-notifier'),
   BUILD_DIR = path.resolve(__dirname, 'build'),
   APP_DIR = path.resolve(__dirname, 'src');
 
-module.exports = {
+module.exports = (env, argv) => ({
   entry: [
     'babel-polyfill',
     APP_DIR + '/index.jsx'
@@ -38,6 +39,7 @@ module.exports = {
     ]
   },
   plugins: [
+    new CleanWebpackPlugin(path.resolve(__dirname, 'build/*.*')),
     new WebpackNotifierPlugin({alwaysNotify: true}),
   ],
   resolve: {
@@ -47,5 +49,11 @@ module.exports = {
     enforceExtension: false,
     extensions: ['.js', '.jsx', '.scss', '.json']
   },
-  devtool: 'source-map'
-};
+  devtool: (
+    argv !== undefined // required for eslint
+    &&
+    argv.mode === 'development'
+  )
+    ? 'source-map'
+    : undefined
+});
